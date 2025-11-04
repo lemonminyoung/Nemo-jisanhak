@@ -38,7 +38,7 @@ async def crawl_cameo_sequential(substances: list) -> list:
     results = []
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, slow_mo=200)
+        browser = await p.chromium.launch(headless=True)
         context = await browser.new_context()
 
         # Open a new page once for the entire process
