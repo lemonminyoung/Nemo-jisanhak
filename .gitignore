@@ -1,0 +1,38 @@
+# 환경 변수 (절대 커밋하면 안됨!)
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+ENV/
+
+# 출력 파일
+output.json
+output_*.txt
+ai_analysis.txt
+test_api_result.json
+test_ai_only_result.txt
+hybrid_*.json
+hybrid_*.txt
+
+# 디버그 파일
+debug_*.png
+debug_*.html
+
+# Old files (not needed for deployment)
+old_files/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
