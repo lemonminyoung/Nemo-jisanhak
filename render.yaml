@@ -6,12 +6,10 @@ services:
     region: oregon
     plan: free
     branch: master
-    buildCommand: pip install -r requirements.txt && playwright install --with-deps chromium
+    buildCommand: pip install -r requirements.txt && PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/.playwright-browsers playwright install chromium
     startCommand: uvicorn backend_with_colab:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: COLAB_API_URL
         sync: false
       - key: GEMINI_API_KEY
         sync: false
-      - key: PLAYWRIGHT_BROWSERS_PATH
-        value: /opt/render/.cache/ms-playwright
