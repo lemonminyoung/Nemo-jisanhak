@@ -43,6 +43,19 @@ if GEMINI_API_KEY:
 else:
     print("[WARNING] Gemini API key not set. Translation will be unavailable.")
 
+# Helper function to safely encode error messages
+def safe_error_message(error: Exception) -> str:
+    """
+    Safely convert exception to ASCII string to avoid encoding errors
+    """
+    try:
+        error_str = str(error)
+        # Try to encode as ASCII, replacing non-ASCII characters
+        safe_msg = error_str.encode('ascii', errors='replace').decode('ascii')
+        return safe_msg if safe_msg.strip() else "An unknown error occurred"
+    except:
+        return "An unknown error occurred during error processing"
+
 # Helper function to suppress Playwright output
 async def crawl_with_suppressed_output(substances: List[str]) -> list:
     """
@@ -373,8 +386,9 @@ async def simple_analyze_endpoint(request: AnalysisRequest):
     except HTTPException:
         raise
     except Exception as e:
-        print(f"[Simple] Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        error_msg = safe_error_message(e)
+        print(f"[Simple] Error: {error_msg}")
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 @app.post("/hybrid-analyze")
@@ -467,8 +481,9 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
     except HTTPException:
         raise
     except Exception as e:
-        print(f"[Hybrid] Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        error_msg = safe_error_message(e)
+        print(f"[Hybrid] Error: {error_msg}")
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 def call_colab_api_for_summary(analysis_result: dict, timeout: int = 120) -> dict:
