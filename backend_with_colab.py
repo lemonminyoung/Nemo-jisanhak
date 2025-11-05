@@ -14,6 +14,8 @@ from simple_analyzer import analyze_simple
 import json
 from dotenv import load_dotenv
 import google.generativeai as genai
+import sys
+from io import StringIO
 
 # .env 파일 로드
 load_dotenv()
@@ -40,6 +42,28 @@ if GEMINI_API_KEY:
     print("[OK] Gemini API configured for translation")
 else:
     print("[WARNING] Gemini API key not set. Translation will be unavailable.")
+
+# Helper function to suppress Playwright output
+async def crawl_with_suppressed_output(substances: List[str]) -> list:
+    """
+    Wrapper to suppress stdout/stderr during Playwright crawling
+    to prevent encoding errors with special characters
+    """
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+
+    try:
+        # Redirect output to nowhere
+        sys.stdout = StringIO()
+        sys.stderr = StringIO()
+
+        # Run the crawl
+        results = await crawl_cameo_sequential(substances)
+        return results
+    finally:
+        # Always restore stdout/stderr
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
 
 # Request/Response 모델
 class AnalysisRequest(BaseModel):
@@ -217,7 +241,7 @@ async def analyze_chemicals(request: AnalysisRequest):
 
         # 1. CAMEO 크롤링
         print("[API] Starting CAMEO crawling...")
-        cameo_results = await crawl_cameo_sequential(request.substances)
+        cameo_results = await crawl_with_suppressed_output(request.substances)
 
         if not cameo_results:
             raise HTTPException(
@@ -325,7 +349,7 @@ async def simple_analyze_endpoint(request: AnalysisRequest):
 
         # CAMEO 크롤링
         print("[Simple] Starting CAMEO crawling...")
-        cameo_results = await crawl_cameo_sequential(request.substances)
+        cameo_results = await crawl_with_suppressed_output(request.substances)
 
         if not cameo_results:
             raise HTTPException(
@@ -379,7 +403,7 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
 
         # 1. CAMEO 크롤링
         print("[Hybrid] Step 1: CAMEO crawling...")
-        cameo_results = await crawl_cameo_sequential(request.substances)
+        cameo_results = await crawl_with_suppressed_output(request.substances)
 
         if not cameo_results:
             raise HTTPException(
