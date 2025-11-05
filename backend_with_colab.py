@@ -1,6 +1,3 @@
-"""
-FastAPI 백엔드 - Colab API 통합 버전 (완전 무료)
-"""
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,6 +19,11 @@ load_dotenv()
 
 app = FastAPI(title="Chemical Reactivity Analysis API")
 
+@app.head("/health")
+@app.get("/health")
+async def health_check(): #uptime robot 용
+    return {"status": "healthy"}
+    
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
