@@ -3,10 +3,6 @@ from playwright.async_api import async_playwright
 import json
 import os
 
-# Set Playwright browser path for Render deployment (if not already set)
-if "PLAYWRIGHT_BROWSERS_PATH" not in os.environ:
-    os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "/opt/render/project/playwright"
-
 # Function to add a substance to MyChemicals
 async def add_substance_to_mychemicals(page, substance: str):
     # Go to search page and search for substance

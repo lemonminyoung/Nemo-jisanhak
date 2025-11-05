@@ -1,19 +1,15 @@
 services:
-  # FastAPI 백엔드 서비스
+  # FastAPI 백엔드 서비스 (Docker)
   - type: web
     name: chemical-analyzer-api
-    env: python
+    env: docker
     region: oregon
     plan: free
     branch: master
-    buildCommand: chmod +x build.sh && ./build.sh
-    startCommand: uvicorn backend_with_colab:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: COLAB_API_URL
         sync: false
       - key: GEMINI_API_KEY
         sync: false
-      - key: PLAYWRIGHT_BROWSERS_PATH
-        value: /opt/render/project/playwright
-      - key: PYTHONIOENCODING
-        value: utf-8
+      - key: PORT
+        value: 8000
