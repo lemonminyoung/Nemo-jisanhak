@@ -468,12 +468,19 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
                     ai_summary_en = f"AI summary unavailable: {error_msg}"
                     ai_status = "error"
 
+        # 간단한 응답 형식 (백엔드용)
+        simple_response = {
+            "risk_level": analysis_result.get("summary", {}).get("overall_status", "알 수 없음"),
+            "message": ai_summary_ko if ai_summary_ko else analysis_result.get("summary", {}).get("message", "")
+        }
+
         return {
             "success": True,
             "rule_based_analysis": analysis_result,
             "ai_summary_english": ai_summary_en,
             "ai_summary_korean": ai_summary_ko,
-            "ai_status": ai_status
+            "ai_status": ai_status,
+            "simple_response": simple_response  # 간단한 형식 추가
         }
 
     except HTTPException:
