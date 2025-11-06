@@ -540,9 +540,11 @@ Caution Pairs: {summary.get('caution_count', 0)}
 
         if response.status_code == 200:
             data = response.json()
+            # Hugging Face API는 "response" 필드를 반환
+            ai_response = data.get("response", "") or data.get("analysis", "")
             return {
                 "success": data.get("success", False),
-                "analysis": data.get("analysis", ""),  # "summary" 대신 "analysis" 사용
+                "analysis": ai_response,
                 "error": data.get("error")
             }
         else:
