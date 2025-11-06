@@ -14,6 +14,8 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import sys
 from io import StringIO
+import hashlib
+from pathlib import Path
 
 # .env 파일 로드
 load_dotenv()
@@ -40,6 +42,48 @@ if GEMINI_API_KEY:
     print("[OK] Gemini API configured for translation")
 else:
     print("[WARNING] Gemini API key not set. Translation will be unavailable.")
+
+# 캐시 디렉토리 설정
+CACHE_DIR = Path("cache")
+CACHE_DIR.mkdir(exist_ok=True)
+print(f"[OK] Cache directory: {CACHE_DIR.absolute()}")
+
+# 캐싱 함수들
+def get_cache_key(substances: List[str]) -> str:
+    """물질 리스트를 정렬하여 캐시 키 생성"""
+    sorted_substances = tuple(sorted([s.strip().lower() for s in substances]))
+    key_string = str(sorted_substances)
+    return hashlib.md5(key_string.encode()).hexdigest()
+
+def get_cached_result(substances: List[str]):
+    """캐시에서 결과 가져오기"""
+    try:
+        cache_key = get_cache_key(substances)
+        cache_file = CACHE_DIR / f"{cache_key}.json"
+
+        if cache_file.exists():
+            print(f"[Cache] HIT for {len(substances)} substances")
+            with open(cache_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        else:
+            print(f"[Cache] MISS for {len(substances)} substances")
+            return None
+    except Exception as e:
+        print(f"[Cache] Error reading cache: {e}")
+        return None
+
+def save_to_cache(substances: List[str], result: dict):
+    """결과를 캐시에 저장"""
+    try:
+        cache_key = get_cache_key(substances)
+        cache_file = CACHE_DIR / f"{cache_key}.json"
+
+        with open(cache_file, 'w', encoding='utf-8') as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
+
+        print(f"[Cache] SAVED for {len(substances)} substances")
+    except Exception as e:
+        print(f"[Cache] Error saving cache: {e}")
 
 # Helper function to safely encode error messages
 def safe_error_message(error: Exception) -> str:
@@ -414,6 +458,12 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
     try:
         print(f"[Hybrid] Analyzing {len(request.substances)} substances...")
 
+        # 0. 캐시 확인
+        cached_result = get_cached_result(request.substances)
+        if cached_result:
+            print("[Hybrid] Returning cached result!")
+            return cached_result
+
         # 1. CAMEO 크롤링
         print("[Hybrid] Step 1: CAMEO crawling...")
         cameo_results = await crawl_with_suppressed_output(request.substances)
@@ -481,7 +531,8 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
             analysis_result.get("caution_pairs", [])
         )
 
-        return {
+        # 최종 결과
+        final_result = {
             "success": True,
             "rule_based_analysis": analysis_result,
             "ai_summary_english": ai_summary_en,
@@ -490,6 +541,11 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
             "simple_response": simple_response,  # 간단한 형식 추가
             "safety_links": safety_links  # 안전 정보 링크 추가
         }
+
+        # 캐시에 저장
+        save_to_cache(request.substances, final_result)
+
+        return final_result
 
     except HTTPException:
         raise
