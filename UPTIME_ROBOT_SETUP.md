@@ -23,6 +23,8 @@ Hugging Face Space와 Render API를 항상 깨어있게 유지하여 Cold Start�
 1. https://uptimerobot.com 접속
 2. 무료 계정 생성 (최대 50개 모니터 무료)
 
+> **참고**: Render API는 이미 UptimeRobot으로 모니터링 중이므로 **Hugging Face Space만 추가**하면 됩니다!
+
 ---
 
 ### 2. Hugging Face Space 모니터 추가
@@ -51,27 +53,14 @@ Hugging Face Space와 Render API를 항상 깨어있게 유지하여 Cold Start�
 
 ---
 
-### 3. Render API 모니터 추가
+### 3. Render API 모니터 (이미 설정됨 ✅)
 
-**Monitor #2: Render Backend API**
+**Render Backend API는 이미 UptimeRobot으로 모니터링 중**이므로 추가 설정이 필요 없습니다.
 
-| 설정 항목 | 값 |
-|----------|---|
-| **Monitor Type** | HTTP(s) |
-| **Friendly Name** | Chemical Safety API - Render |
-| **URL** | `https://nemo-jisanhak-6lu8.onrender.com/` |
-| **Monitoring Interval** | 5 minutes |
-| **Monitor Timeout** | 30 seconds |
-| **HTTP Method** | GET |
-
-**설정 방법:**
-1. Dashboard → Add New Monitor 클릭
-2. Monitor Type: "HTTP(s)" 선택
-3. Friendly Name: "Chemical Safety API - Render" 입력
-4. URL: `https://nemo-jisanhak-6lu8.onrender.com/` 입력
-5. Monitoring Interval: "5 minutes" 선택
-6. HTTP Method: GET (기본값)
-7. Create Monitor 클릭
+기존 설정 확인:
+- URL: `https://nemo-jisanhak-6lu8.onrender.com/`
+- Interval: 5분
+- Status: Up ✅
 
 ---
 
@@ -79,10 +68,10 @@ Hugging Face Space와 Render API를 항상 깨어있게 유지하여 Cold Start�
 
 ### 모니터 상태 확인
 1. UptimeRobot Dashboard 접속
-2. 두 모니터가 "Up" 상태인지 확인
+2. **Hugging Face Space 모니터**가 "Up" 상태인지 확인
 3. Response Time이 정상 범위인지 확인:
    - Hugging Face: 5-15초 (정상)
-   - Render: 1-3초 (정상)
+   - Render: 1-3초 (이미 설정됨)
 
 ### 효과 테스트
 **Before (UptimeRobot 없이):**
