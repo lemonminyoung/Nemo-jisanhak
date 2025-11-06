@@ -72,7 +72,7 @@ def test_hybrid_analyze():
 
     substances = ["Hydrogen Peroxide", "Acetic Acid"]
     print(f"Testing with: {substances}")
-    print("⚠️  This requires Colab to be running!")
+    print("⚠️  This requires AI API to be running!")
 
     start = time.time()
 
@@ -120,7 +120,7 @@ def test_hybrid_analyze():
                 print(f"\n💾 Saved to: render_test_result.json")
 
             elif ai_status == "unavailable":
-                print("⚠️  Colab API not configured or not running")
+                print("⚠️  AI API not configured or not running")
             elif ai_status == "error":
                 print(f"❌ AI Error: {data.get('ai_summary', 'Unknown')}")
 
@@ -162,8 +162,8 @@ if __name__ == "__main__":
     # Test 2: Simple Analyze
     results.append(("Simple Analyze", test_simple_analyze()))
 
-    # Test 3: Hybrid Analyze (requires Colab)
-    print("\n⚠️  Next test requires Colab to be running!")
+    # Test 3: Hybrid Analyze (requires AI API)
+    print("\n⚠️  Next test requires AI API to be running!")
     print("Press Enter to continue, or Ctrl+C to skip...")
     try:
         input()

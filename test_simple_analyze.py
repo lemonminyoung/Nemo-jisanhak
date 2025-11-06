@@ -153,7 +153,7 @@ def compare_with_ai():
         print(f"    Error: {e}")
 
     # AI 분석
-    print("\n[2] AI Analyze (with Colab)...")
+    print("\n[2] AI Analyze (with AI)...")
     start_ai = time.time()
     try:
         response_ai = requests.post(

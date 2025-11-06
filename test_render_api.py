@@ -47,7 +47,7 @@ except Exception as e:
 
 # Test 3: Hybrid Analyze (AI)
 print("\n[3] Hybrid Analyze (Rules + AI Summary)...")
-print("WARNING: This requires Colab to be running!")
+print("WARNING: This requires AI API to be running!")
 print("Analyzing... (1-3 minutes)")
 
 try:
@@ -91,9 +91,9 @@ try:
             print("\nALL TESTS PASSED!")
 
         elif ai_status == "unavailable":
-            print("WARNING: Colab API not configured or not running")
-            print("  - Check Colab notebook is running")
-            print("  - Check COLAB_API_URL environment variable")
+            print("WARNING: AI API not configured or not running")
+            print("  - Check Hugging Face Spaces is running")
+            print("  - Check AI_API_URL environment variable")
 
         else:
             print("AI ERROR:", data.get('ai_summary', 'Unknown'))
