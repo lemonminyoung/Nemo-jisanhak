@@ -1,5 +1,35 @@
 # Chemical Safety Analysis API Documentation
 
+## 🚀 빠른 시작 (5분 안에 연동하기)
+
+### 1. API 호출 (가장 간단한 방법)
+```bash
+curl -X POST "https://nemo-jisanhak-6lu8.onrender.com/hybrid-analyze" \
+  -H "Content-Type: application/json" \
+  -d '{"substances": ["Bleach", "Ammonia"], "use_ai": true}'
+```
+
+### 2. 백엔드에서 사용할 필드 (이것만 보세요!)
+```json
+{
+  "simple_response": {
+    "risk_level": "위험",    // "위험", "주의", "안전" 중 하나
+    "message": "안녕하세요! 화학 안전 도우미입니다..."  // 사용자에게 보여줄 메시지
+  },
+  "safety_links": {
+    "msds_links": [...],           // 각 화학물질 MSDS 링크
+    "general_resources": [...]     // KOSHA 등 공식 자료
+  }
+}
+```
+
+### 3. 주의사항
+- ⏱️ **타임아웃**: 최소 300초 (5분) 설정 필요
+- 🐢 **첫 요청**: Cold start로 30-60초 추가 소요
+- 💡 **권장**: `simple_response` 필드만 사용하세요 (나머지는 무시해도 됨)
+
+---
+
 ## Base URL
 ```
 https://nemo-jisanhak-6lu8.onrender.com
@@ -475,13 +505,65 @@ displayMessage(message);        // 사용자 친화적인 한국어 메시지
 
 ---
 
+## 📋 백엔드 개발자를 위한 체크리스트
+
+### 필수 구현 사항
+- [ ] API 엔드포인트: `POST /hybrid-analyze`
+- [ ] Request Body: `{"substances": [...], "use_ai": true}`
+- [ ] HTTP 타임아웃: **최소 300초 (5분)**
+- [ ] Response 파싱: `response.simple_response.risk_level`, `response.simple_response.message`
+
+### UI에 표시할 데이터
+```javascript
+// 1. 위험도 표시 (필수)
+const riskLevel = response.simple_response.risk_level;
+// "위험" -> 빨간색 경고
+// "주의" -> 주황색 주의
+// "안전" -> 초록색 안전
+
+// 2. 메시지 표시 (필수)
+const message = response.simple_response.message;
+// 사용자 친화적인 한국어 설명
+
+// 3. 안전 링크 표시 (선택)
+const links = response.safety_links;
+// MSDS 링크, 공식 자료 등
+```
+
+### 에러 처리
+```javascript
+// HTTP 500: 서버 에러 -> "일시적 오류입니다. 잠시 후 다시 시도해주세요"
+// HTTP 400: 잘못된 요청 -> "최소 2개 이상의 물질을 입력해주세요"
+// Timeout: "분석 시간이 초과되었습니다. 다시 시도해주세요"
+```
+
+### 테스트용 샘플 데이터
+```json
+// 위험한 조합
+{"substances": ["Bleach", "Ammonia"]}
+
+// 안전한 조합
+{"substances": ["Water", "Salt"]}
+
+// 복잡한 조합 (10개)
+{"substances": ["Bleach", "Ammonia", "Vinegar", "Hydrogen Peroxide", "Rubbing Alcohol", "Baking Soda", "Sulfuric Acid", "Sodium Hydroxide", "Acetone", "Hydrochloric Acid"]}
+```
+
+---
+
 ## Support
 - GitHub: https://github.com/lemonminyoung/Nemo-jisanhak
 - Issues: https://github.com/lemonminyoung/Nemo-jisanhak/issues
+- API 문서: 이 파일을 공유하세요!
 
 ---
 
 ## Changelog
+
+### v2.1.0 (2025-01-06)
+- `safety_links` 필드 추가 (MSDS, 공식 자료 링크)
+- Gemini 프롬프트 개선 (중복 제거, 구체적 조건 명시)
+- API 문서 개선 (백엔드 개발자용 가이드 추가)
 
 ### v2.0.0 (2025-01-06)
 - Hugging Face Space 연동
