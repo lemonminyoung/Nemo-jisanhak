@@ -36,9 +36,7 @@ Hugging Face Space와 Render API를 항상 깨어있게 유지하여 Cold Start�
 | **URL** | `https://gimchabssal-chemical-ai.hf.space/` |
 | **Monitoring Interval** | 5 minutes |
 | **Monitor Timeout** | 30 seconds |
-| **HTTP Method** | POST |
-| **POST Value** | `{"prompt": "health check"}` |
-| **Content-Type** | application/json |
+| **HTTP Method** | GET (기본값) |
 
 **설정 방법:**
 1. Dashboard → Add New Monitor 클릭
@@ -46,11 +44,10 @@ Hugging Face Space와 Render API를 항상 깨어있게 유지하여 Cold Start�
 3. Friendly Name: "Chemical AI - Hugging Face" 입력
 4. URL: `https://gimchabssal-chemical-ai.hf.space/` 입력
 5. Monitoring Interval: "5 minutes" 선택
-6. Advanced Settings 확장:
-   - HTTP Method: POST 선택
-   - POST Value (Data): `{"prompt": "health check"}` 입력
-   - POST Type (Content-Type): application/json 선택
+6. HTTP Method: GET (기본값 그대로)
 7. Create Monitor 클릭
+
+> **참고**: GET 요청만으로도 Hugging Face Space가 깨어나고 활성 상태를 유지합니다.
 
 ---
 
@@ -148,11 +145,11 @@ curl -X POST "https://nemo-jisanhak-6lu8.onrender.com/hybrid-analyze" \
 ## 🛠️ 트러블슈팅
 
 ### 문제 1: Hugging Face 모니터가 계속 "Down" 상태
-**원인**: POST 요청이 실패하거나 타임아웃
+**원인**: HTTP Method가 잘못 설정되었거나 타임아웃
 **해결**:
-1. POST Value가 올바른지 확인: `{"prompt": "health check"}`
-2. Content-Type이 `application/json`인지 확인
-3. Monitor Timeout을 60초로 늘려보기
+1. HTTP Method가 **GET**으로 설정되어 있는지 확인
+2. URL이 정확한지 확인: `https://gimchabssal-chemical-ai.hf.space/`
+3. Monitor Timeout을 60초로 늘려보기 (Hugging Face는 응답이 느릴 수 있음)
 
 ### 문제 2: Response Time이 너무 길어요
 **원인**: Cold start가 여전히 발생
