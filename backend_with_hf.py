@@ -537,9 +537,9 @@ Caution Pairs: {summary.get('caution_count', 0)}
 
         prompt += "\nProvide a concise safety summary (2-3 sentences)."
 
-        # AI 요청
+        # AI 요청 (Hugging Face Space는 루트 엔드포인트 사용)
         response = requests.post(
-            f"{AI_API_URL}/analyze",  # /analyze 엔드포인트 사용
+            AI_API_URL,  # 루트 엔드포인트
             json={"prompt": prompt},
             timeout=timeout
         )
