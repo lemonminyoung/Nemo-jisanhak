@@ -499,15 +499,33 @@ def call_ai_api_for_summary(analysis_result: dict, timeout: int = 120) -> dict:
     try:
         print(f"[AI-Summary] Calling AI service for summary...")
 
-        # AI에게 보낼 프롬프트 데이터
-        summary_request = {
-            "task": "summarize",  # 요약 작업임을 명시
-            "analysis": analysis_result
-        }
+        # 분석 결과를 프롬프트로 변환
+        summary = analysis_result.get("summary", {})
+        dangerous_pairs = analysis_result.get("dangerous_pairs", [])
 
+        # 프롬프트 생성
+        prompt = f"""Analyze the following chemical safety data and provide a brief safety summary in English.
+
+Overall Status: {summary.get('overall_status', 'Unknown')}
+Dangerous Pairs: {summary.get('dangerous_count', 0)}
+Caution Pairs: {summary.get('caution_count', 0)}
+
+"""
+
+        # 위험한 조합 추가
+        if dangerous_pairs:
+            prompt += "Dangerous Combinations:\n"
+            for pair in dangerous_pairs[:3]:  # 최대 3개만
+                prompt += f"- {pair.get('chemical_1', '')} + {pair.get('chemical_2', '')}\n"
+                prompt += f"  Status: {pair.get('status', '')}\n"
+                prompt += f"  Hazards: {', '.join(pair.get('hazards', [])[:3])}\n"
+
+        prompt += "\nProvide a concise safety summary (2-3 sentences)."
+
+        # AI 요청
         response = requests.post(
-            f"{AI_API_URL}/summarize",  # 새로운 엔드포인트
-            json=summary_request,
+            f"{AI_API_URL}/analyze",  # /analyze 엔드포인트 사용
+            json={"prompt": prompt},
             timeout=timeout
         )
 
@@ -517,7 +535,7 @@ def call_ai_api_for_summary(analysis_result: dict, timeout: int = 120) -> dict:
             data = response.json()
             return {
                 "success": data.get("success", False),
-                "analysis": data.get("summary", ""),
+                "analysis": data.get("analysis", ""),  # "summary" 대신 "analysis" 사용
                 "error": data.get("error")
             }
         else:
