@@ -484,7 +484,7 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
         raise HTTPException(status_code=500, detail=error_msg)
 
 
-def call_ai_api_for_summary(analysis_result: dict, timeout: int = 120) -> dict:
+def call_ai_api_for_summary(analysis_result: dict, timeout: int = 240) -> dict:
     """
     AI API 호출 - AI 요약용 (Hugging Face Spaces)
 
