@@ -7,7 +7,7 @@ services:
     plan: free
     branch: master
     envVars:
-      - key: COLAB_API_URL
+      - key: AI_API_URL
         sync: false
       - key: GEMINI_API_KEY
         sync: false
