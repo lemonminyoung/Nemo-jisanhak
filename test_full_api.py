@@ -1,5 +1,5 @@
 """
-Full API Test - CAMEO crawling + Colab AI analysis
+Full API Test - CAMEO crawling + AI analysis
 """
 
 import requests
@@ -12,7 +12,7 @@ def test_full_pipeline():
     """전체 파이프라인 테스트"""
 
     print("=" * 70)
-    print("Full API Test - CAMEO + Colab AI")
+    print("Full API Test - CAMEO + AI")
     print("=" * 70)
 
     # 테스트 데이터
@@ -25,7 +25,7 @@ def test_full_pipeline():
     print("\n[1] Sending request to /analyze endpoint...")
     print("    This will:")
     print("    - Crawl CAMEO website for reactivity data")
-    print("    - Send data to Colab for AI analysis")
+    print("    - Send data to AI service for analysis")
     print("    - Return comprehensive safety report")
 
     start_time = time.time()
@@ -83,7 +83,7 @@ def test_full_pipeline():
                 analysis_file = "test_full_api_analysis.txt"
                 with open(analysis_file, "w", encoding="utf-8") as f:
                     f.write("=" * 70 + "\n")
-                    f.write("CHEMICAL SAFETY ANALYSIS BY COLAB AI\n")
+                    f.write("CHEMICAL SAFETY ANALYSIS BY AI\n")
                     f.write("=" * 70 + "\n\n")
                     f.write(analysis_text)
                     f.write("\n\n" + "=" * 70 + "\n")
@@ -91,7 +91,7 @@ def test_full_pipeline():
 
             elif ai_status == "unavailable":
                 print("\n    [WARNING] AI analysis was not available")
-                print("    Check if Colab API URL is configured correctly")
+                print("    Check if AI API URL is configured correctly")
 
             elif ai_status == "error":
                 print(f"\n    [FAIL] AI analysis failed")
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         print("=" * 70)
         print("\nTroubleshooting:")
         print("1. Check if backend is running: http://localhost:8000/health")
-        print("2. Check if Colab notebook is still running")
+        print("2. Check if AI service is still running")
         print("3. Check network connection")
         print("=" * 70)
         exit(1)

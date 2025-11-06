@@ -119,8 +119,8 @@ def test_hybrid_analyze():
                 print(f"AI summary saved to: {summary_file}")
 
             elif ai_status == "unavailable":
-                print("\n[WARNING] Colab API not configured")
-                print("Set COLAB_API_URL to enable AI summary")
+                print("\n[WARNING] AI API not configured")
+                print("Set AI_API_URL to enable AI summary")
 
             elif ai_status == "error":
                 print("\n[ERROR] AI summary failed")
@@ -260,7 +260,7 @@ if __name__ == "__main__":
 
     print("\n[INFO] Testing complete!")
     print("\nNext steps:")
-    print("  1. Add /summarize endpoint to Colab (see COLAB_SUMMARIZE_CELL.md)")
-    print("  2. Restart Colab Flask app")
+    print("  1. Ensure /summarize endpoint exists in AI service")
+    print("  2. Check AI service is running")
     print("  3. Test again with use_ai=True")
     print("")

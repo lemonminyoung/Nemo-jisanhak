@@ -47,7 +47,7 @@ except Exception as e:
 
 # Test 3: Hybrid Analyze (AI 요약 포함)
 print("\n[3] Hybrid Analyze (규칙 + AI 요약)...")
-print("⚠️  이 테스트는 Colab이 실행 중이어야 합니다!")
+print("⚠️  이 테스트는 AI API가 실행 중이어야 합니다!")
 print("⏳ 분석 중... (1~3분 소요)")
 
 try:
@@ -91,9 +91,9 @@ try:
             print("\n✨ 모든 테스트 성공!")
 
         elif ai_status == "unavailable":
-            print("⚠️  Colab API가 설정되지 않았거나 실행 중이 아닙니다")
-            print("   - Colab 노트북 실행 확인")
-            print("   - COLAB_API_URL 환경 변수 확인")
+            print("⚠️  AI API가 설정되지 않았거나 실행 중이 아닙니다")
+            print("   - Hugging Face Spaces 실행 확인")
+            print("   - AI_API_URL 환경 변수 확인")
 
         else:
             print(f"❌ AI 오류: {data.get('ai_summary', 'Unknown')}")

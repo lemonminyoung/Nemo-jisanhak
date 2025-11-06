@@ -33,9 +33,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Colab API URL (환경변수 또는 직접 설정)
-# Colab에서 ngrok URL을 받으면 여기 설정
-AI_API_URL = os.getenv("AI_API_URL", "https://gimchabssal-chemical-ai.hf.space")  # 예: https://xxxx.ngrok.io
+# AI API URL (환경변수 또는 직접 설정)
+# Hugging Face Spaces URL
+AI_API_URL = os.getenv("AI_API_URL", "https://gimchabssal-chemical-ai.hf.space")
 
 # Gemini API Key (번역용)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
@@ -93,9 +93,9 @@ class AnalysisResponse(BaseModel):
     error: Optional[str] = None
 
 
-def call_colab_api(cameo_results: List[dict], timeout: int = 300) -> dict:  # 5분으로 증가
+def call_ai_api(cameo_results: List[dict], timeout: int = 300) -> dict:  # 5분으로 증가
     """
-    Colab API 호출
+    AI API 호출 (Hugging Face Spaces)
 
     Args:
         cameo_results: CAMEO 크롤링 결과
@@ -107,15 +107,15 @@ def call_colab_api(cameo_results: List[dict], timeout: int = 300) -> dict:  # 5�
     if not AI_API_URL:
         return {
             "success": False,
-            "error": "Colab API URL not configured"
+            "error": "AI API URL not configured"
         }
 
     try:
-        print(f"[AI API] Calling Colab API at {AI_API_URL}")
+        print(f"[AI API] Calling AI API at {AI_API_URL}")
         print(f"[AI API] Sending {len(cameo_results)} results")
 
-        # Colab 헬스 체크
-        print("[AI API] Checking Colab health...")
+        # AI 헬스 체크
+        print("[AI API] Checking AI service health...")
         health_response = requests.get(
             f"{AI_API_URL}/health",
             timeout=5
@@ -125,7 +125,7 @@ def call_colab_api(cameo_results: List[dict], timeout: int = 300) -> dict:  # 5�
             print(f"[AI API] [FAIL] Health check failed: {health_response.status_code}")
             return {
                 "success": False,
-                "error": "Colab server not healthy"
+                "error": "AI server not healthy"
             }
 
         print("[AI API] [OK] Health check passed")
@@ -174,13 +174,13 @@ def call_colab_api(cameo_results: List[dict], timeout: int = 300) -> dict:  # 5�
         print("[AI API] [TIMEOUT] Request timeout")
         return {
             "success": False,
-            "error": "Colab API timeout (model might be loading)"
+            "error": "AI API timeout (model might be loading)"
         }
     except requests.exceptions.ConnectionError as e:
         print(f"[AI API] [CONNECTION ERROR]: {e}")
         return {
             "success": False,
-            "error": "Cannot connect to Colab (check if Colab is running)"
+            "error": "Cannot connect to AI service (check if service is running)"
         }
     except Exception as e:
         print(f"[AI API] [ERROR] Unexpected error: {e}")
@@ -200,43 +200,43 @@ async def root():
         "service": "Chemical Reactivity Analysis API",
         "status": "running",
         "version": "1.0.0",
-        "colab_configured": bool(AI_API_URL)
+        "ai_configured": bool(AI_API_URL)
     }
 
 
 @app.get("/health")
 async def health_check():
     """상세 헬스 체크"""
-    colab_status = "not configured"
+    ai_status = "not configured"
 
     if AI_API_URL:
         try:
             response = requests.get(f"{AI_API_URL}/health", timeout=3)
             if response.status_code == 200:
-                colab_status = "connected"
+                ai_status = "connected"
             else:
-                colab_status = "error"
+                ai_status = "error"
         except:
-            colab_status = "unreachable"
+            ai_status = "unreachable"
 
     return {
         "status": "healthy",
-        "colab_api": colab_status,
-        "colab_url": AI_API_URL if AI_API_URL else "Not set"
+        "ai_api": ai_status,
+        "ai_url": AI_API_URL if AI_API_URL else "Not set"
     }
 
 
-@app.post("/set-colab-url")
-async def set_colab_url(url: str):
+@app.post("/set-ai-url")
+async def set_ai_url(url: str):
     """
-    Colab URL을 동적으로 설정
-    (Colab 세션 재시작 시 사용)
+    AI API URL을 동적으로 설정
+    (Hugging Face Spaces URL 변경 시 사용)
     """
     global AI_API_URL
     AI_API_URL = url.rstrip('/')
     return {
         "success": True,
-        "message": f"Colab URL updated to: {AI_API_URL}"
+        "message": f"AI API URL updated to: {AI_API_URL}"
     }
 
 
@@ -272,18 +272,18 @@ async def analyze_chemicals(request: AnalysisRequest):
         # 2. AI 분석 (선택사항)
         if request.use_ai:
             if not AI_API_URL:
-                print("[API] Warning: Colab API URL not set. Skipping AI analysis.")
+                print("[API] Warning: AI API URL not set. Skipping AI analysis.")
                 ai_status = "unavailable"
             else:
-                print("[API] Starting AI analysis via Colab...")
-                colab_response = call_colab_api(cameo_results)
+                print("[API] Starting AI analysis via Hugging Face...")
+                ai_response = call_ai_api(cameo_results)
 
-                if colab_response.get("success"):
-                    ai_analysis = colab_response.get("analysis", "")
+                if ai_response.get("success"):
+                    ai_analysis = ai_response.get("analysis", "")
                     ai_status = "success"
                     print("[API] AI analysis complete.")
                 else:
-                    error_msg = colab_response.get("error", "Unknown error")
+                    error_msg = ai_response.get("error", "Unknown error")
                     print(f"[API] AI analysis failed: {error_msg}")
                     ai_analysis = f"AI analysis unavailable: {error_msg}"
                     ai_status = "error"
@@ -311,22 +311,22 @@ async def analyze_from_json(cameo_results: List[dict]):
         if not AI_API_URL:
             raise HTTPException(
                 status_code=503,
-                detail="Colab API URL not configured"
+                detail="AI API URL not configured"
             )
 
         print(f"[API] Analyzing {len(cameo_results)} pre-crawled results...")
 
-        colab_response = call_colab_api(cameo_results)
+        ai_response = call_ai_api(cameo_results)
 
-        if colab_response.get("success"):
+        if ai_response.get("success"):
             return {
                 "success": True,
-                "ai_analysis": colab_response.get("analysis", "")
+                "ai_analysis": ai_response.get("analysis", "")
             }
         else:
             raise HTTPException(
                 status_code=500,
-                detail=colab_response.get("error", "AI analysis failed")
+                detail=ai_response.get("error", "AI analysis failed")
             )
 
     except HTTPException:
@@ -441,16 +441,16 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
         # 3. AI 요약 (선택사항)
         if request.use_ai:
             if not AI_API_URL:
-                print("[Hybrid] Warning: Colab API not configured")
+                print("[Hybrid] Warning: AI API not configured")
                 ai_status = "unavailable"
             else:
-                print("[Hybrid] Step 3: AI summarization via Colab...")
+                print("[Hybrid] Step 3: AI summarization via Hugging Face...")
 
                 # AI에게 분석 결과를 보내서 요약문 생성 (영어)
-                colab_response = call_colab_api_for_summary(analysis_result)
+                ai_response = call_ai_api_for_summary(analysis_result)
 
-                if colab_response.get("success"):
-                    ai_summary_en = colab_response.get("analysis", "")
+                if ai_response.get("success"):
+                    ai_summary_en = ai_response.get("analysis", "")
                     print("[Hybrid] AI summary (EN) complete")
 
                     # Step 4: Gemini로 친근한 한국어 번역
@@ -467,7 +467,7 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
                         ai_summary_ko = f"Translation unavailable: {error_msg}"
                         ai_status = "partial"  # 영어 요약은 성공, 번역은 실패
                 else:
-                    error_msg = colab_response.get("error", "Unknown error")
+                    error_msg = ai_response.get("error", "Unknown error")
                     print(f"[Hybrid] AI summary failed: {error_msg}")
                     ai_summary_en = f"AI summary unavailable: {error_msg}"
                     ai_status = "error"
@@ -488,20 +488,20 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
         raise HTTPException(status_code=500, detail=error_msg)
 
 
-def call_colab_api_for_summary(analysis_result: dict, timeout: int = 120) -> dict:
+def call_ai_api_for_summary(analysis_result: dict, timeout: int = 120) -> dict:
     """
-    Colab API 호출 - AI 요약용
+    AI API 호출 - AI 요약용 (Hugging Face Spaces)
 
     분석 결과를 AI에게 보내서 사용자 친화적인 요약문만 생성
     """
     if not AI_API_URL:
         return {
             "success": False,
-            "error": "Colab API URL not configured"
+            "error": "AI API URL not configured"
         }
 
     try:
-        print(f"[Colab-Summary] Calling Colab for summary...")
+        print(f"[AI-Summary] Calling AI service for summary...")
 
         # AI에게 보낼 프롬프트 데이터
         summary_request = {
@@ -515,7 +515,7 @@ def call_colab_api_for_summary(analysis_result: dict, timeout: int = 120) -> dic
             timeout=timeout
         )
 
-        print(f"[Colab-Summary] Response status: {response.status_code}")
+        print(f"[AI-Summary] Response status: {response.status_code}")
 
         if response.status_code == 200:
             data = response.json()
@@ -533,10 +533,10 @@ def call_colab_api_for_summary(analysis_result: dict, timeout: int = 120) -> dic
     except requests.exceptions.Timeout:
         return {
             "success": False,
-            "error": "Colab API timeout"
+            "error": "AI API timeout"
         }
     except Exception as e:
-        print(f"[Colab-Summary] Error: {e}")
+        print(f"[AI-Summary] Error: {e}")
         return {
             "success": False,
             "error": str(e)
@@ -696,9 +696,9 @@ if __name__ == "__main__":
 
     # .env 파일에서 AI_API_URL 로드 확인
     if AI_API_URL:
-        print(f"[OK] Colab API URL configured: {AI_API_URL}")
+        print(f"[OK] AI API URL configured: {AI_API_URL}")
     else:
-        print("[WARNING] Colab API URL not set. AI analysis will be unavailable.")
-        print("         Set AI_API_URL in .env or use POST /set-colab-url")
+        print("[WARNING] AI API URL not set. AI analysis will be unavailable.")
+        print("         Set AI_API_URL in .env or use POST /set-ai-url")
 
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -38,13 +38,13 @@
 
 - **Backend**: FastAPI, Python 3.11
 - **크롤링**: Playwright (NOAA CAMEO)
-- **AI**: Google Gemini API (번역), Colab ChemLLM (분석)
-- **배포**: Railway.app
+- **AI**: Google Gemini API (번역), Hugging Face Spaces ChemLLM (분석)
+- **배포**: Render.com
 
 ## 환경 변수
 
 ```env
-COLAB_API_URL=https://your-colab-ngrok-url.ngrok.io
+AI_API_URL=https://your-huggingface-space.hf.space
 GEMINI_API_KEY=your-gemini-api-key
 ```
 
@@ -56,7 +56,7 @@ pip install -r requirements.txt
 playwright install chromium
 
 # 서버 실행
-python backend_with_colab.py
+python backend_with_hf.py
 ```
 
 서버는 `http://localhost:8000`에서 실행됩니다.
