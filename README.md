@@ -212,8 +212,12 @@ API 응답 시간이 길기 때문에 클라이언트에서 반드시 타임아�
 - `/simple-analyze`: 최소 120초 (2분)
 - `/hybrid-analyze`: 최소 300초 (5분)
 
-### Cold Start 처리
+### Cold Start 처리 및 성능 개선
 Render 무료 플랜 사용 시 첫 요청은 30-60초 추가 소요됩니다.
+
+**⚡ 성능 개선 방법**:
+- **UptimeRobot 설정** (무료) - Cold Start 방지, 응답 시간 50% 단축!
+- 📖 **[UPTIME_ROBOT_SETUP.md](./UPTIME_ROBOT_SETUP.md)** - 5분 안에 설정 가능
 
 ---
 
