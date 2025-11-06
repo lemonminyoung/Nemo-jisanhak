@@ -19,11 +19,6 @@ load_dotenv()
 
 app = FastAPI(title="Chemical Reactivity Analysis API")
 
-@app.head("/health")
-@app.get("/health")
-async def health_check(): #uptime robot 용
-    return {"status": "healthy"}
-    
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
@@ -204,9 +199,10 @@ async def root():
     }
 
 
+@app.head("/health")
 @app.get("/health")
 async def health_check():
-    """상세 헬스 체크"""
+    """상세 헬스 체크 (Uptime Robot 지원)"""
     ai_status = "not configured"
 
     if AI_API_URL:
