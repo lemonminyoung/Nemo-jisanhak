@@ -8,6 +8,7 @@ from typing import List, Optional
 import os
 from chemical_analyzer import crawl_cameo_sequential
 from simple_analyzer import analyze_simple
+from safety_links import get_all_links_for_analysis
 import json
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -474,13 +475,20 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
             "message": ai_summary_ko if ai_summary_ko else analysis_result.get("summary", {}).get("message", "")
         }
 
+        # 안전 정보 링크 수집 (위험/주의 조합에 대해서만)
+        safety_links = get_all_links_for_analysis(
+            analysis_result.get("dangerous_pairs", []),
+            analysis_result.get("caution_pairs", [])
+        )
+
         return {
             "success": True,
             "rule_based_analysis": analysis_result,
             "ai_summary_english": ai_summary_en,
             "ai_summary_korean": ai_summary_ko,
             "ai_status": ai_status,
-            "simple_response": simple_response  # 간단한 형식 추가
+            "simple_response": simple_response,  # 간단한 형식 추가
+            "safety_links": safety_links  # 안전 정보 링크 추가
         }
 
     except HTTPException:

@@ -132,6 +132,45 @@ https://nemo-jisanhak-6lu8.onrender.com
   "simple_response": {
     "risk_level": "위험",
     "message": "안녕하세요! 화학 안전 도우미입니다. 😊\n\n확인 결과 1가지 위험 결과가 발견되었습니다!..."
+  },
+  "safety_links": {
+    "specific_links": [
+      {
+        "title": "과산화수소 취급 안전 지침",
+        "url": "https://www.kosha.or.kr",
+        "source": "안전보건공단",
+        "type": "안전지침"
+      }
+    ],
+    "msds_links": [
+      {
+        "chemical": "ACETIC ACID, GLACIAL",
+        "url": "https://msds.kosha.or.kr/MSDSInfo/kcic/msdsSearch.do?menuId=13&msdsEname=ACETIC+ACID,+GLACIAL",
+        "title": "ACETIC ACID, GLACIAL 물질안전보건자료(MSDS)"
+      },
+      {
+        "chemical": "HYDROGEN PEROXIDE",
+        "url": "https://msds.kosha.or.kr/MSDSInfo/kcic/msdsSearch.do?menuId=13&msdsEname=HYDROGEN+PEROXIDE",
+        "title": "HYDROGEN PEROXIDE 물질안전보건자료(MSDS)"
+      }
+    ],
+    "general_resources": [
+      {
+        "title": "MSDS 통합검색 (안전보건공단)",
+        "url": "https://msds.kosha.or.kr/",
+        "description": "모든 화학물질의 물질안전보건자료(MSDS) 검색"
+      },
+      {
+        "title": "화학물질 안전정보 (환경부)",
+        "url": "https://ncis.nier.go.kr/",
+        "description": "국가 화학물질 정보시스템"
+      },
+      {
+        "title": "화학물질 배출이동량 정보",
+        "url": "https://tri.me.go.kr/",
+        "description": "화학물질 배출량 및 유해성 정보"
+      }
+    ]
   }
 }
 ```
@@ -149,6 +188,10 @@ https://nemo-jisanhak-6lu8.onrender.com
 - `simple_response` (object): **백엔드 사용 권장 필드**
   - `risk_level` (string): "위험", "주의", "안전"
   - `message` (string): 사용자에게 보여줄 최종 메시지
+- `safety_links` (object): **안전 정보 링크 (위험/주의 조합일 때만 제공)**
+  - `specific_links` (array): 특정 화학물질 조합에 대한 사고예방 기사 및 안전지침
+  - `msds_links` (array): 각 화학물질의 MSDS(물질안전보건자료) 검색 링크
+  - `general_resources` (array): 공식 화학물질 안전정보 사이트 (KOSHA, 환경부 등)
 
 ---
 
