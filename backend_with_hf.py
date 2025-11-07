@@ -121,9 +121,13 @@ async def crawl_with_suppressed_output(substances: List[str]) -> list:
         sys.stderr = old_stderr
 
 # Request/Response 모델
+class Product(BaseModel):
+    productName: str
+    casNumbers: List[str]
+
 class AnalysisRequest(BaseModel):
-    substances: List[str]
-    use_ai: bool = True
+    useAi: bool = True
+    products: List[Product]
 
 class AnalysisResponse(BaseModel):
     success: bool
@@ -447,6 +451,21 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
     - 정확도: 100% (CAMEO 데이터)
     - 가독성: AI가 문장 정리
 
+    Input Format:
+        {
+            "useAi": true,
+            "products": [
+                {
+                    "productName": "Bleach Cleaner",
+                    "casNumbers": ["103-95-7", "64-17-5"]
+                },
+                {
+                    "productName": "Ammonia Solution",
+                    "casNumbers": ["1336-21-6"]
+                }
+            ]
+        }
+
     Returns:
         {
             "success": true,
@@ -456,17 +475,22 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
         }
     """
     try:
-        print(f"[Hybrid] Analyzing {len(request.substances)} substances...")
+        # products 배열에서 모든 CAS 번호 추출
+        all_cas_numbers = []
+        for product in request.products:
+            all_cas_numbers.extend(product.casNumbers)
+
+        print(f"[Hybrid] Analyzing {len(all_cas_numbers)} CAS numbers from {len(request.products)} products...")
 
         # 0. 캐시 확인
-        cached_result = get_cached_result(request.substances)
+        cached_result = get_cached_result(all_cas_numbers)
         if cached_result:
             print("[Hybrid] Returning cached result!")
             return cached_result
 
         # 1. CAMEO 크롤링
         print("[Hybrid] Step 1: CAMEO crawling...")
-        cameo_results = await crawl_with_suppressed_output(request.substances)
+        cameo_results = await crawl_with_suppressed_output(all_cas_numbers)
 
         if not cameo_results:
             raise HTTPException(
@@ -486,7 +510,7 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
         ai_status = "skipped"
 
         # 3. AI 요약 (선택사항)
-        if request.use_ai:
+        if request.useAi:
             if not AI_API_URL:
                 print("[Hybrid] Warning: AI API not configured")
                 ai_status = "unavailable"
@@ -543,7 +567,7 @@ async def hybrid_analyze_endpoint(request: AnalysisRequest):
         }
 
         # 캐시에 저장
-        save_to_cache(request.substances, final_result)
+        save_to_cache(all_cas_numbers, final_result)
 
         return final_result
 
