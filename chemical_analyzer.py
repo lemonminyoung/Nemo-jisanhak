@@ -7,9 +7,9 @@ import os
 async def add_substance_to_mychemicals(page, substance: str):
     # Go to search page and search for substance
     await page.goto("https://cameochemicals.noaa.gov/search/simple", wait_until="networkidle")
-    
-    # Locate the input field by id and fill in the substance name
-    input_box = page.locator("input#name")
+
+    # Locate the CAS number input field and fill in the substance CAS number
+    input_box = page.locator("input[name='cas']")
     await input_box.fill(substance)
     await input_box.press("Enter")
     await page.wait_for_load_state("networkidle")
